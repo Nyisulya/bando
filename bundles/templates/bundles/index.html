@@ -1,0 +1,398 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.business_name }} - Mabando ya Internet ya Halotel</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Nunua mabando ya Halotel ya bei nafuu kabisa. Huduma ya haraka na ya kuaminika kwa sekunde 30 tu.">
+    <meta name="keywords" content="Halotel, mabando, bando la bei nafuu, internet, tanzania, HaloPesa">
+    
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fa-solid fa-bolt"></i> {{ config.business_name }} <span class="logo-dot"></span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="#duka" class="nav-link">Mabando ya Internet</a></li>
+                <li><a href="#jinsi-inavyofanya-kazi" class="nav-link">Jinsi ya Kununua</a></li>
+                <li>
+                    <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-moon" id="theme-icon"></i>
+                    </button>
+                </li>
+                <li><a href="https://wa.me/{{ config.whatsapp_number }}?text=Habari! Naomba kuuliza kuhusu mabando ya internet." target="_blank" class="nav-btn"><i class="fa-brands fa-whatsapp"></i> Msaada</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-tag"><i class="fa-solid fa-fire"></i> Ofa za Leo - Halotel Internet</span>
+            <h1>Mabando ya Internet ya Halotel ya Bei Nafuu</h1>
+            <p>{{ config.welcome_message }}</p>
+            <div class="hero-actions">
+                <a href="#duka" class="nav-btn" style="background: linear-gradient(135deg, var(--secondary), var(--primary)); font-size: 1.1rem; padding: 0.8rem 1.8rem;"><i class="fa-solid fa-basket-shopping"></i> Nunua Internet</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="stat-number">Masaa 24/7</div>
+            <div class="stat-label">Huduma ipo mtandaoni muda wote</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-number">Uaminifu 100%</div>
+            <div class="stat-label">Malipo ni salama kabisa</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-rocket"></i></div>
+            <div class="stat-number">Sekunde 30</div>
+            <div class="stat-label">Bando linaingia kwa sekunde chache</div>
+        </div>
+    </div>
+
+    <!-- Shop / Bundles Section -->
+    <section class="shop-section" id="duka">
+        <div class="section-header">
+            <div class="section-title">
+                <h2>Chagua Bando la Internet la Leo</h2>
+                <p>Mabando yetu ya ofa yanapatikana kulingana na muda unaotaka:</p>
+            </div>
+        </div>
+
+        <!-- Controls: Tabs and Search -->
+        <div class="controls-wrapper">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-category="zote">
+                    <i class="fa-solid fa-border-all"></i> Zote
+                </button>
+                {% for category in categories %}
+                    <button class="tab-btn" data-category="{{ category.slug }}">
+                        <i class="fa-solid fa-clock"></i> {{ category.name }}
+                    </button>
+                {% endfor %}
+            </div>
+            
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Tafuta bando mfano: 1.5GB...">
+            </div>
+        </div>
+
+        <!-- Bundles Grid -->
+        <div class="bundles-grid" id="bundles-grid">
+            {% for bundle in bundles %}
+                <div class="bundle-card" data-category="{{ bundle.category.slug }}" data-name="{{ bundle.name | lower }}" data-price="{{ bundle.price }}">
+                    {% if bundle.is_hot %}
+                        <span class="hot-badge">Maarufu <i class="fa-solid fa-fire"></i></span>
+                    {% endif %}
+                    
+                    <span class="bundle-category">
+                        <i class="fa-solid fa-wifi"></i> {{ bundle.category.name }}
+                    </span>
+                    <h3 class="bundle-name">{{ bundle.name }}</h3>
+                    
+                    <div class="bundle-limits">
+                        <div class="limit-item">
+                            <i class="fa-solid fa-database"></i>
+                            <span style="font-weight: 700; color: var(--text-primary); font-size: 1.1rem;">{{ bundle.data_limit }}</span>
+                        </div>
+                        <div class="limit-item">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            <span>Muda: {{ bundle.validity }}</span>
+                        </div>
+                        {% if bundle.description %}
+                            <div class="limit-item" style="margin-top: 0.5rem; font-style: italic; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>{{ bundle.description }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="bundle-price-tag">
+                        <span class="price-currency">TSH</span>
+                        <span class="price-value">{{ bundle.price }}</span>
+                        <span class="price-validity">/ {{ bundle.validity }}</span>
+                    </div>
+                    
+                    <button class="buy-btn" onclick="openOrderModal('{{ bundle.id }}', '{{ bundle.name }}', '{{ bundle.price }}')">
+                        <i class="fa-solid fa-cart-shopping"></i> Nunua Sasa
+                    </button>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-face-frown"></i></div>
+                    <h3>Hamna mabando ya internet kwa sasa</h3>
+                    <p>Mabando yatawekwa hivi punde na msimamizi. Tafadhali rudi baadae.</p>
+                </div>
+            {% endfor %}
+            
+            <!-- JavaScript fallback dynamic empty state -->
+            <div class="empty-state" id="no-search-results" style="display: none;">
+                <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <h3>Bando halikupatikana</h3>
+                <p>Jaribu kutafuta neno lingine kama vile "GB", "Siku" au "1000".</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="jinsi-inavyofanya-kazi">
+        <div class="how-container">
+            <div class="how-title">
+                <h2>Jinsi ya Kununua Rahisi na Haraka</h2>
+                <p>Pata bando lako la Halotel kwa hatua hizi tatu:</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <h3>Chagua Bando la Internet</h3>
+                    <p>Tafuta bando linalokufaa kwenye orodha kisha bonyeza kitufe cha "Nunua Sasa".</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <h3>Lipa Kiasi Husika</h3>
+                    <p>Weka namba ya Halotel ya kupokea bando na ufanye malipo kwenye Lipa Namba yetu.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <h3>Thibitisha WhatsApp</h3>
+                    <p>Mfumo utakuelekeza WhatsApp ambapo utathibitisha malipo na kuwekewa bando mara moja!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Modal -->
+    <div class="modal" id="order-modal">
+        <div class="modal-overlay" onclick="closeOrderModal()"></div>
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeOrderModal()">&times;</button>
+            <h3 class="modal-title">Agiza Bando Lako</h3>
+            <p class="modal-subtitle">Jaza namba yako kupokea bando.</p>
+            
+            <div class="bundle-summary-box">
+                <div class="summary-details">
+                    <h4 id="modal-bundle-name">Jina la Bando</h4>
+                    <span>Huduma ya Haraka - Halotel</span>
+                </div>
+                <div class="summary-price" id="modal-bundle-price">TSH 0</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="customer-phone" class="form-label">Namba ya Halotel ya Kupokea Bando</label>
+                <input type="tel" id="customer-phone" class="form-input" placeholder="Mfano: 0621XXXXXX au 061XXXXXXX" required>
+                <span id="phone-error" style="font-size: 0.8rem; color: #ef4444; display: none; margin-top: 0.25rem;">Tafadhali weka namba sahihi ya Halotel inayotambulika (mfano: 062... au 061...)</span>
+            </div>
+            
+            <div class="payment-instructions-box">
+                <div class="payment-title">
+                    <i class="fa-solid fa-wallet"></i> Maelekezo ya Malipo:
+                </div>
+                <div id="payment-instructions-text">{{ config.payment_instructions }}</div>
+            </div>
+            
+            <button class="submit-btn" onclick="submitToWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> Kamilisha WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Widget -->
+    <a href="https://wa.me/{{ config.whatsapp_number }}?text=Habari! Naomba kuuliza kuhusu huduma za mabando ya internet ya Halotel." target="_blank" class="whatsapp-floating" aria-label="WhatsApp Contact">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="#duka">Mabando ya Internet</a>
+            <a href="#jinsi-inavyofanya-kazi">Jinsi ya Kununua</a>
+            <a href="https://wa.me/{{ config.whatsapp_number }}">Msaada</a>
+        </div>
+        <div class="footer-copy">
+            &copy; {% now "Y" %} {{ config.business_name }}. Haki zote zimehifadhiwa. <br>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Mabando ya internet yanabadilika kulingana na ofa za siku za Halotel.</span>
+        </div>
+    </footer>
+
+    <!-- Frontend Script Logic -->
+    <script>
+        // Global variables for active bundle order
+        let activeBundleName = "";
+        let activeBundlePrice = "";
+        const resellerWhatsApp = "{{ config.whatsapp_number }}";
+
+        // DOM elements
+        const searchInput = document.getElementById('search-input');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const bundleCards = document.querySelectorAll('.bundle-card');
+        const noSearchResults = document.getElementById('no-search-results');
+        const orderModal = document.getElementById('order-modal');
+        const modalBundleName = document.getElementById('modal-bundle-name');
+        const modalBundlePrice = document.getElementById('modal-bundle-price');
+        const customerPhoneInput = document.getElementById('customer-phone');
+        const phoneError = document.getElementById('phone-error');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Theme Toggle Logic
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeUI(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI(newTheme);
+        });
+
+        function updateThemeUI(theme) {
+            if (theme === 'light') {
+                themeIcon.className = 'fa-solid fa-sun';
+            } else {
+                themeIcon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // Category Tab Filtering & Search Filtering
+        let activeCategory = 'zote';
+        let searchQuery = '';
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategory = btn.getAttribute('data-category');
+                filterBundles();
+            });
+        });
+
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value.toLowerCase().trim();
+            filterBundles();
+        });
+
+        function filterBundles() {
+            let visibleCount = 0;
+            
+            bundleCards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardName = card.getAttribute('data-name');
+                const cardPrice = card.getAttribute('data-price');
+                
+                const categoryMatches = (activeCategory === 'zote' || cardCategory === activeCategory);
+                const searchMatches = (
+                    searchQuery === '' || 
+                    cardName.includes(searchQuery) || 
+                    cardPrice.includes(searchQuery) ||
+                    cardCategory.includes(searchQuery)
+                );
+                
+                if (categoryMatches && searchMatches) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (visibleCount === 0 && bundleCards.length > 0) {
+                noSearchResults.style.display = 'block';
+            } else {
+                noSearchResults.style.display = 'none';
+            }
+        }
+
+        // Modal Functionality
+        function openOrderModal(bundleId, name, price) {
+            activeBundleName = name;
+            activeBundlePrice = price;
+            
+            modalBundleName.innerText = name;
+            modalBundlePrice.innerText = 'TSH ' + parseInt(price).toLocaleString('en-US');
+            
+            // Open modal
+            orderModal.classList.add('active');
+            customerPhoneInput.focus();
+            
+            // Clean error states
+            phoneError.style.display = 'none';
+            customerPhoneInput.style.borderColor = '';
+        }
+
+        function closeOrderModal() {
+            orderModal.classList.remove('active');
+        }
+
+        // Submit to WhatsApp Logic
+        function submitToWhatsApp() {
+            const rawPhone = customerPhoneInput.value.trim();
+            
+            // Basic validation for Tanzanian phone number
+            const cleanPhone = rawPhone.replace(/[\s\-\+]/g, ''); // strip spaces, hyphens, plus signs
+            
+            let isValid = false;
+            let formattedPhone = cleanPhone;
+
+            if (cleanPhone.startsWith('062') && cleanPhone.length === 10) {
+                isValid = true;
+                formattedPhone = '255' + cleanPhone.substring(1);
+            } else if (cleanPhone.startsWith('061') && cleanPhone.length === 10) {
+                isValid = true;
+                formattedPhone = '255' + cleanPhone.substring(1);
+            } else if (cleanPhone.startsWith('25562') && cleanPhone.length === 12) {
+                isValid = true;
+            } else if (cleanPhone.startsWith('25561') && cleanPhone.length === 12) {
+                isValid = true;
+            } else if (cleanPhone.length >= 9 && (cleanPhone.startsWith('62') || cleanPhone.startsWith('61')) && cleanPhone.length === 9) {
+                isValid = true;
+                formattedPhone = '255' + cleanPhone;
+            }
+
+            if (!isValid) {
+                phoneError.style.display = 'block';
+                customerPhoneInput.style.borderColor = '#ef4444';
+                return;
+            }
+
+            // Valid phone number. Format order text.
+            const dateStr = new Date().toLocaleDateString('sw-TZ', {day: 'numeric', month: 'long', year: 'numeric'});
+            const message = `Habari! \n\nNinahitaji kununua bando la internet lifuatalo:\n` + 
+                            `• *Bando:* ${activeBundleName}\n` +
+                            `• *Bei:* TSH ${parseInt(activeBundlePrice).toLocaleString('en-US')}\n` +
+                            `• *Namba ya Kupokea bando:* ${rawPhone}\n` +
+                            `• *Tarehe:* ${dateStr}\n\n` +
+                            `Nimeshafanya malipo kama yalivyoelekezwa kwenye tovuti. Tafadhali niwekee bando sasa.`;
+
+            // Open WhatsApp link
+            const encodedMsg = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${resellerWhatsApp}?text=${encodedMsg}`;
+            
+            window.open(waUrl, '_blank');
+            closeOrderModal();
+        }
+    </script>
+</body>
+</html>

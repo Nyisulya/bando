@@ -1,0 +1,530 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - {{ config.business_name }}</title>
+    
+    <!-- Icons and CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    
+    <style>
+        /* Extra styles specific to the dashboard layout */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        
+        .panel-title {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.75rem;
+        }
+        
+        /* Table / List styling for bundles */
+        .bundle-table-wrapper {
+            overflow-x: auto;
+        }
+        
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        .db-table th {
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        
+        .db-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        
+        .db-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+        
+        /* Inline input for price */
+        .inline-price-input {
+            width: 90px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.4rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .inline-price-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+        
+        /* Status Switches */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-input);
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: #fff;
+        }
+        
+        /* Actions button */
+        .action-btn-del {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.4rem;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn-del:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            transform: scale(1.1);
+        }
+        
+        /* Alert toasts */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--accent);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast-error {
+            border-color: #ef4444;
+        }
+        
+        .toast-error i {
+            color: #ef4444;
+        }
+        
+        .toast-success i {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fa-solid fa-bolt"></i> {{ config.business_name }} <span style="font-size:0.75rem; background:rgba(255,111,0,0.1); padding:0.25rem 0.5rem; border-radius:4px; color:var(--primary);">Control Panel</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link" target="_blank"><i class="fa-solid fa-eye"></i> Angalia Site</a></li>
+                <li><a href="{% url 'bundles:logout' %}" class="nav-link" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Ondoka</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="dashboard-container">
+        
+        <!-- Left Column: Bundle Management -->
+        <main>
+            <div class="dashboard-header">
+                <div>
+                    <h1 style="font-size: 1.75rem;">Usimamizi wa Mabando ya Internet</h1>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Badilisha bei, dhibiti bando lipo wazi au lifungwe kwa kubonyeza switch moja kwa moja.</p>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title"><i class="fa-solid fa-wifi"></i> Mabando Yaliyopo</h3>
+                
+                <div class="bundle-table-wrapper">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th>Kundi (Muda)</th>
+                                <th>Jina la Bando</th>
+                                <th>Kiasi (Internet)</th>
+                                <th>Bei (TSH)</th>
+                                <th style="text-align: center;">Active?</th>
+                                <th style="text-align: center;">Hot?</th>
+                                <th style="text-align: center;">Futa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bundle in bundles %}
+                                <tr id="row-{{ bundle.id }}">
+                                    <td>
+                                        <span style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 0.25rem 0.5rem; border-radius: 4px;">
+                                            {{ bundle.category.name }}
+                                        </span>
+                                    </td>
+                                    <td style="font-weight: 600;">{{ bundle.name }}</td>
+                                    <td>{{ bundle.data_limit }}</td>
+                                    <td>
+                                        <input type="number" 
+                                               class="inline-price-input" 
+                                               value="{{ bundle.price }}" 
+                                               onchange="updatePrice('{{ bundle.id }}', this.value)"
+                                               min="0">
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <label class="switch">
+                                            <input type="checkbox" 
+                                                   {% if bundle.is_active %}checked{% endif %} 
+                                                   onchange="toggleStatus('{{ bundle.id }}', 'is_active', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <label class="switch">
+                                            <input type="checkbox" 
+                                                   {% if bundle.is_hot %}checked{% endif %} 
+                                                   onchange="toggleStatus('{{ bundle.id }}', 'is_hot', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <form method="POST" action="{% url 'bundles:delete_bundle' bundle.id %}" onsubmit="return confirm('Je, una uhakika unataka kufuta bando hili?')">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-btn-del" title="Futa Bando">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 3rem;">
+                                        Uweka mabando bado. Tumia fomu ya upande wa kulia kuongeza bando lako la kwanza.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Right Column: Add Bundle Form & Settings -->
+        <aside>
+            <!-- Panel: Add Bundle -->
+            <div class="panel">
+                <h3 class="panel-title"><i class="fa-solid fa-circle-plus"></i> Ongeza Bando Jipya</h3>
+                <form method="POST" action="{% url 'bundles:add_bundle' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Kundi la Muda</label>
+                        {{ bundle_form.category }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Jina la Bando</label>
+                        {{ bundle_form.name }}
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Mfano: Internet 1.5GB Siku nzima</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kiasi cha Internet</label>
+                        {{ bundle_form.data_limit }}
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Mfano: 1.5 GB au 500 MB</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Muda wa Matumizi (Validity)</label>
+                        {{ bundle_form.validity }}
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Mfano: Masaa 24, Siku 7</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Bei (TSH)</label>
+                        {{ bundle_form.price }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Maelezo ya Ziada (Optional)</label>
+                        {{ bundle_form.description }}
+                    </div>
+                    
+                    <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem;">
+                            {{ bundle_form.is_active }} Bando Lipo Wazi (Active)
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem;">
+                            {{ bundle_form.is_hot }} Bando Maarufu (Hot)
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, var(--primary), var(--primary-hover)); box-shadow: 0 4px 15px var(--primary-glow);">
+                        <i class="fa-solid fa-floppy-disk"></i> Hifadhi Bando
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Panel: Site Config Settings -->
+            <div class="panel">
+                <h3 class="panel-title"><i class="fa-solid fa-gears"></i> Mipangilio ya Tovuti</h3>
+                <form method="POST" action="{% url 'bundles:update_settings' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Jina la Biashara (Title)</label>
+                        {{ config_form.business_name }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Namba ya WhatsApp kupokea oda</label>
+                        {{ config_form.whatsapp_number }}
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Anza na 255 (Usianze na + au 0). Mfano: 255620123456</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ujumbe wa Karibu (Hero Paragraph)</label>
+                        {{ config_form.welcome_message }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Maelekezo ya Malipo (Lipa Namba n.k.)</label>
+                        {{ config_form.payment_instructions }}
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, var(--accent), #059669); box-shadow: 0 4px 15px var(--accent-glow);">
+                        <i class="fa-solid fa-circle-check"></i> Hifadhi Mipangilio
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Alert Toast notifications -->
+    <div class="toast" id="toast-notify">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="toast-text">Mabadiliko yamehifadhiwa!</span>
+    </div>
+
+    <!-- AJAX Scripts -->
+    <script>
+        // Helper function to get cookie (CSRF Token)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Toast notifications logic
+        const toast = document.getElementById('toast-notify');
+        const toastText = document.getElementById('toast-text');
+        
+        function showNotification(message, isError = false) {
+            toastText.innerText = message;
+            if (isError) {
+                toast.classList.add('toast-error');
+                toast.classList.remove('toast-success');
+                toast.querySelector('i').className = 'fa-solid fa-circle-xmark';
+            } else {
+                toast.classList.add('toast-success');
+                toast.classList.remove('toast-error');
+                toast.querySelector('i').className = 'fa-solid fa-circle-check';
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle is_active or is_hot via Fetch API
+        function toggleStatus(bundleId, fieldName, isChecked) {
+            const url = `/dashboard/bundle/toggle/${bundleId}/`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    field: fieldName,
+                    value: isChecked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification("Hali ya bando imesasishwa kwa mafanikio!");
+                } else {
+                    showNotification("Imefeli kusasisha hali ya bando: " + data.error, true);
+                    // Revert UI check
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification("Itifaki ya mawasiliano imefeli. Jaribu tena.", true);
+                location.reload();
+            });
+        }
+
+        // Update bundle price via Fetch API
+        function updatePrice(bundleId, priceValue) {
+            const url = `/dashboard/bundle/update-price/${bundleId}/`;
+            const price = parseInt(priceValue);
+            
+            if (isNaN(price) || price < 0) {
+                showNotification("Tafadhali weka namba halali ya bei!", true);
+                return;
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    price: price
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification("Bei ya bando imesasishwa kwa mafanikio!");
+                } else {
+                    showNotification("Imefeli kusasisha bei: " + data.error, true);
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification("Itifaki ya mawasiliano imefeli. Jaribu tena.", true);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

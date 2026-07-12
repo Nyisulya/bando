@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingia - Usimamizi wa Mabando</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, rgba(255, 111, 0, 0.12), transparent 45%),
+                        radial-gradient(circle at bottom left, rgba(255, 179, 0, 0.05), transparent 40%);
+        }
+        .login-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        .login-logo {
+            font-size: 2.25rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .login-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .login-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        .error-banner {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <span class="login-logo"><i class="fa-solid fa-bolt"></i> Control Panel</span>
+        <h2>Ingia kwenye Mfumo</h2>
+        <p>Weka taarifa zako za siri kuingia kwenye usimamizi wa mabando.</p>
+        
+        {% if error %}
+            <div class="error-banner">
+                <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+            </div>
+        {% endif %}
+        
+        <form method="POST" action="{% url 'bundles:login' %}">
+            {% csrf_token %}
+            <div class="form-group" style="text-align: left;">
+                <label for="username" class="form-label">Jina la Siri (Username)</label>
+                <input type="text" name="username" id="username" class="form-input" placeholder="Jina lako la siri" required>
+            </div>
+            
+            <div class="form-group" style="text-align: left; margin-bottom: 2rem;">
+                <label for="password" class="form-label">Neno la Siri (Password)</label>
+                <input type="password" name="password" id="password" class="form-input" placeholder="Neno lako la siri" required>
+            </div>
+            
+            <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, var(--primary), var(--primary-hover)); box-shadow: 0 4px 15px var(--primary-glow);">
+                <i class="fa-solid fa-right-to-bracket"></i> Ingia Sasa
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>
