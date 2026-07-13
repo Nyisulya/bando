@@ -1,8 +1,11 @@
 from django.core.management.base import BaseCommand
-from bundles.models import BundleCategory, Bundle, ResellerConfig
+from django.contrib.auth import get_user_model
+from bundles.models import BundleCategory, Bundle, Tenant
+
+User = get_user_model()
 
 class Command(BaseCommand):
-    help = 'Seeds initial duration categories, internet bundles, and config for Halotel reseller'
+    help = 'Seeds initial duration categories, internet bundles, and a default tenant for SaaS platform'
 
     def handle(self, *args, **options):
         self.stdout.write('Seeding database for Internet-only bundles...')
@@ -10,6 +13,7 @@ class Command(BaseCommand):
         # 1. Clear existing data to prevent duplicate slug errors
         Bundle.objects.all().delete()
         BundleCategory.objects.all().delete()
+        Tenant.objects.all().delete()
 
         # 2. Create Duration categories
         cat_daily = BundleCategory.objects.create(
@@ -33,9 +37,30 @@ class Command(BaseCommand):
 
         self.stdout.write('Created Duration Categories.')
 
+        # Create a default user and tenant
+        self.stdout.write('Creating default tenant owner user...')
+        User.objects.filter(username='reseller').delete()
+        user = User.objects.create_user(
+            username='reseller',
+            email='reseller@bando.com',
+            password='reseller123'
+        )
+
+        tenant = Tenant.objects.create(
+            owner=user,
+            subdomain='reseller',
+            business_name='Halotel Mabando Express',
+            whatsapp_number='255620123456',
+            welcome_message='Karibu Halotel Mabando Express! Pata mabando ya internet ya Halotel kwa bei nafuu sana. Huduma yetu ni ya haraka masaa 24/7.',
+            payment_instructions='Lipa kwa:\n1. HaloPesa: Lipa Namba (Till) 998877 (Halotel Mabando Express)\n2. M-Pesa: Lipa Namba (Till) 554433 (Halotel Mabando Express)\n\nBaada ya kufanya muamala, weka namba yako hapo juu na ubonyeze kitufe kuwasilisha malipo WhatsApp.',
+            is_active=True
+        )
+        self.stdout.write('Created Default Tenant.')
+
         # 3. Create Internet-only Bundles
         # Daily
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet - 500 MB',
             category=cat_daily,
             price=500,
@@ -44,6 +69,7 @@ class Command(BaseCommand):
             description='Kasi ya 4G, inafaa kwa matumizi madogo.'
         )
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet Super - 1.5 GB',
             category=cat_daily,
             price=1000,
@@ -55,6 +81,7 @@ class Command(BaseCommand):
         
         # Weekly
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet Wiki - 3.5 GB',
             category=cat_weekly,
             price=3000,
@@ -63,6 +90,7 @@ class Command(BaseCommand):
             description='Bando la wiki la bei nafuu sana.'
         )
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet Heavy - 10 GB',
             category=cat_weekly,
             price=8000,
@@ -74,6 +102,7 @@ class Command(BaseCommand):
         
         # Monthly
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet Mwezi Lite - 15 GB',
             category=cat_monthly,
             price=12000,
@@ -82,6 +111,7 @@ class Command(BaseCommand):
             description='Bando la mwezi la matumizi ya kawaida.'
         )
         Bundle.objects.create(
+            tenant=tenant,
             name='Halotel Internet Mwezi Mega - 25 GB',
             category=cat_monthly,
             price=20000,
@@ -91,16 +121,5 @@ class Command(BaseCommand):
         )
 
         self.stdout.write('Created Internet Bundles.')
-
-        # 4. Create ResellerConfig
-        ResellerConfig.objects.all().delete()
-        ResellerConfig.objects.create(
-            business_name='Halotel Mabando Express',
-            whatsapp_number='255620123456',
-            welcome_message='Karibu Halotel Mabando Express! Pata mabando ya internet ya Halotel kwa bei nafuu sana. Huduma yetu ni ya haraka masaa 24/7.',
-            payment_instructions='Lipa kwa:\n1. HaloPesa: Lipa Namba (Till) 998877 (Halotel Mabando Express)\n2. M-Pesa: Lipa Namba (Till) 554433 (Halotel Mabando Express)\n\nBaada ya kufanya muamala, weka namba yako hapo juu na ubonyeze kitufe kuwasilisha malipo WhatsApp.',
-            is_active_config=True
-        )
-
-        self.stdout.write('Created ResellerConfig.')
         self.stdout.write(self.style.SUCCESS('Database seeded successfully!'))
+

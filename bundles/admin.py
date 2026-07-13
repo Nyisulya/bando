@@ -1,10 +1,19 @@
 from django.contrib import admin
-from .models import BundleCategory, Bundle, ResellerConfig
+from .models import BundleCategory, Bundle, Tenant
 
-# Customize the Admin Site Header & Title for the reseller
-admin.site.site_header = "Usimamizi wa Mabando (Halotel Reseller)"
-admin.site.site_title = "Halotel Reseller Admin Portal"
-admin.site.index_title = "Karibu kwenye Mfumo wa Mabando"
+# Customize the Admin Site Header & Title for the platform owner
+admin.site.site_header = "Usimamizi wa Mabando SaaS"
+admin.site.site_title = "Bando SaaS Admin Portal"
+admin.site.index_title = "Usimamizi wa Mfumo wa Mabando (Tenants)"
+
+@admin.register(Tenant)
+class TenantAdmin(admin.ModelAdmin):
+    list_display = ('business_name', 'subdomain', 'owner', 'is_active', 'paid_until', 'whatsapp_number', 'updated_at')
+    list_editable = ('is_active', 'paid_until')
+    search_fields = ('business_name', 'subdomain', 'whatsapp_number', 'owner__username')
+    list_filter = ('is_active', 'paid_until', 'created_at')
+    ordering = ('subdomain',)
+
 
 @admin.register(BundleCategory)
 class BundleCategoryAdmin(admin.ModelAdmin):
@@ -16,34 +25,23 @@ class BundleCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Bundle)
 class BundleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'validity', 'is_active', 'is_hot', 'updated_at')
+    list_display = ('name', 'tenant', 'category', 'price', 'validity', 'is_active', 'is_hot', 'updated_at')
     list_editable = ('price', 'is_active', 'is_hot')
-    list_filter = ('category', 'is_active', 'is_hot', 'validity')
+    list_filter = ('tenant', 'category', 'is_active', 'is_hot', 'validity')
     search_fields = ('name', 'description')
-    ordering = ('category', 'price')
+    ordering = ('tenant', 'category', 'price')
     list_per_page = 20
 
     fieldsets = (
         ("Taarifa za Msingi", {
-            'fields': ('name', 'category', 'price', 'validity')
+            'fields': ('tenant', 'name', 'category', 'price', 'validity')
         }),
         ("Vipimo vya Mabando", {
-            'fields': ('data_limit', 'voice_limit', 'sms_limit'),
-            'description': 'Jaza vipimo vinavyohusika tu kwa bando hili.'
+            'fields': ('data_limit',),
+            'description': 'Jaza vipimo vya bando hili.'
         }),
         ("Hali na Maelezo", {
             'fields': ('description', 'is_active', 'is_hot')
         }),
     )
 
-
-@admin.register(ResellerConfig)
-class ResellerConfigAdmin(admin.ModelAdmin):
-    list_display = ('business_name', 'whatsapp_number', 'is_active_config')
-    list_editable = ('is_active_config',)
-    
-    def save_model(self, request, obj, form, change):
-        # Ensure only one ResellerConfig is active at a time
-        if obj.is_active_config:
-            ResellerConfig.objects.exclude(pk=obj.pk).update(is_active_config=False)
-        super().save_model(request, obj, form, change)

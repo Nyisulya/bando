@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bando SaaS - Anzisha Tovuti Yako ya Mabando ya Halotel</title>
+    <meta name="description" content="Tengeneza website yako ya mabando ya Halotel na kuanza biashara ya kuuza mabando mtandaoni kwa sekunde chache na subdomain yako.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: rgba(22, 28, 45, 0.7);
+            --bg-card-hover: rgba(30, 41, 59, 0.8);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --secondary: #a855f7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        header {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(11, 15, 25, 0.8);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.6rem 1.3rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1000px;
+            margin: 5rem auto 4rem auto;
+            text-align: center;
+            padding: 0 1.5rem;
+        }
+
+        .hero-badge {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #e2e8f0, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        /* Subdomain Search Card */
+        .search-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 24px;
+            max-width: 650px;
+            margin: 0 auto 3rem auto;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 26px;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .search-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .input-group {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            padding: 0.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .input-group input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            outline: none;
+            min-width: 0;
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-group-addon {
+            display: flex;
+            align-items: center;
+            padding-right: 1.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                background: transparent;
+                border: none;
+                gap: 1rem;
+            }
+            .input-group input {
+                background: rgba(15, 23, 42, 0.6);
+                border: 1px solid var(--border-color);
+                border-radius: 9999px;
+            }
+            .input-group-addon {
+                display: none;
+            }
+            .search-btn {
+                width: 100%;
+            }
+        }
+
+        /* Features Section */
+        .features-grid {
+            max-width: 1100px;
+            margin: 4rem auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            max-width: 600px;
+            margin: 5rem auto;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+
+        .pricing-title {
+            margin-bottom: 3rem;
+        }
+
+        .pricing-title h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-title p {
+            color: var(--text-muted);
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.1);
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 0.3rem 1.2rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .price {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            color: white;
+        }
+
+        .price span {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-main);
+            font-size: 1.05rem;
+        }
+
+        .pricing-features li i {
+            color: #10b981;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+
+        footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Toast warning styling */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #ef4444;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fa-solid fa-bolt"></i> BandoSaaS <span style="color:var(--secondary);">.</span>
+            </a>
+            <a href="https://wa.me/255620123456?text=Habari! Nataka kujua jinsi ya kujiunga na mfumo wa mabando ya Halotel." target="_blank" class="nav-btn">
+                <i class="fa-brands fa-whatsapp"></i> Wasiliana Nasi
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <span class="hero-badge">
+            <i class="fa-solid fa-rocket"></i> Mfumo Mpya wa Kibiashara
+        </span>
+        <h1>Anzisha Duka Lako la Mabando Mtandaoni</h1>
+        <p>Wape wateja wako wepesi wa kununua mabando kupitia subdomain yako ya kipekee. Simamia bei, angalia mabando, na pokea oda WhatsApp kiurahisi kabisa.</p>
+
+        <!-- Search / Subdomain Input -->
+        <div class="search-card">
+            <h3>Ingia au Tafuta Duka la Reseller</h3>
+            <div class="input-group">
+                <input type="text" id="subdomain-input" placeholder="Andika jina la duka (mfano: reseller)">
+                <span class="input-group-addon" id="addon-host">.localhost:8000</span>
+                <button class="search-btn" onclick="navigateToTenant()">
+                    Fungua Duka <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 0.5rem;"></i>
+                </button>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                Kumbuka: Kama tayari umesajiliwa, andika jina lako hapo juu na ubonyeze kitufe.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-grid">
+        <div class="feature-card">
+            <div class="icon-box">
+                <i class="fa-solid fa-globe"></i>
+            </div>
+            <h3>Subdomain Yako Mwenyewe</h3>
+            <p>Utapata link yako ya kipekee kama vile <code>reseller.bando.co.tz</code> ili wateja wako wakufikie kirahisi na duka lionekane la kitaalamu.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon-box">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            <h3>Dashboard Kamili</h3>
+            <p>Uwezo kamili wa kubadilisha bei za mabando, kuongeza mabando mapya, kufuta yaliyopitwa na wakati na kuboresha ujumbe na namba yako ya malipo.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon-box">
+                <i class="fa-solid fa-comment-sms"></i>
+            </div>
+            <h3>Direct WhatsApp Orders</h3>
+            <p>Mteja anapochagua bando, mfumo unamuelekeza moja kwa moja kwenye namba yako ya WhatsApp akiwa na oda yake, na wewe unampa huduma.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing-section">
+        <div class="pricing-title">
+            <h2>Gharama Nafuu za Uendeshaji</h2>
+            <p>Lipia kulingana na matumizi bila mikataba migumu.</p>
+        </div>
+
+        <div class="pricing-card">
+            <span class="popular-tag">Kifurushi Maarufu</span>
+            <h3>SaaS Reseller Pro</h3>
+            <div class="price">TSH 10,000<span>/ mwezi</span></div>
+            <ul class="pricing-features">
+                <li><i class="fa-solid fa-circle-check"></i> Subdomain ya Kipekee (.bando.co.tz)</li>
+                <li><i class="fa-solid fa-circle-check"></i> Dashboard ya Reseller</li>
+                <li><i class="fa-solid fa-circle-check"></i> Mabando na Makundi yasiyo na kikomo</li>
+                <li><i class="fa-solid fa-circle-check"></i> Msaada kwa WhatsApp 24/7</li>
+                <li><i class="fa-solid fa-circle-check"></i> Ripoti na Takwimu za Mauzo</li>
+            </ul>
+            <a href="https://wa.me/255620123456?text=Habari! Nataka kujisajili kwenye kifurushi cha SaaS Reseller Pro TSH 10,000." target="_blank" class="nav-btn" style="display: block; font-size: 1.1rem; padding: 0.9rem;">
+                Jiunge Sasa Hapa <i class="fa-brands fa-whatsapp" style="margin-left: 0.5rem;"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BandoSaaS. Haki zote zimehifadhiwa.</p>
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.2);">Powered by Antigravity AI Engine</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="warning-toast">Andika jina la duka kwanza!</div>
+
+    <script>
+        // Update host label dynamically in the input addon based on current hostname
+        document.addEventListener("DOMContentLoaded", function() {
+            let host = window.location.host;
+            if (host.startsWith("127.0.0.1")) {
+                host = host.replace("127.0.0.1", "localhost");
+            }
+            document.getElementById("addon-host").innerText = "." + host;
+        });
+
+        function navigateToTenant() {
+            const inputVal = document.getElementById("subdomain-input").value.trim().toLowerCase();
+            const toast = document.getElementById("warning-toast");
+            
+            if (!inputVal) {
+                toast.style.display = "block";
+                setTimeout(() => {
+                    toast.style.display = "none";
+                }, 3000);
+                return;
+            }
+
+            // Remove any special characters to keep slug safe
+            const cleanSlug = inputVal.replace(/[^a-z0-9-]/g, '');
+            
+            if (!cleanSlug) {
+                toast.innerText = "Jina lina herufi zisizokubalika!";
+                toast.style.display = "block";
+                setTimeout(() => {
+                    toast.style.display = "none";
+                    toast.innerText = "Andika jina la duka kwanza!";
+                }, 3000);
+                return;
+            }
+
+            // Redirect to tenant subdomain
+            const protocol = window.location.protocol;
+            let host = window.location.host; // e.g. "localhost:8000" or "bando.co.tz"
+            
+            // If running locally on IP (127.0.0.1), replace it with localhost
+            // because IP addresses do not support DNS subdomains (e.g. reseller.127.0.0.1 is invalid)
+            if (host.startsWith("127.0.0.1")) {
+                host = host.replace("127.0.0.1", "localhost");
+            }
+            
+            window.location.href = `${protocol}//${cleanSlug}.${host}/`;
+        }
+    </script>
+</body>
+</html>

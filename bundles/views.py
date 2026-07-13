@@ -6,24 +6,31 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from .models import BundleCategory, Bundle, ResellerConfig
+from .models import BundleCategory, Bundle, Tenant
 from .forms import BundleForm, ResellerConfigForm
 
 def index(request):
-    config = ResellerConfig.objects.filter(is_active_config=True).first()
-    if not config:
-        config = ResellerConfig(
-            business_name="Halotel Bundle Reseller",
-            whatsapp_number="255621234567",
-            welcome_message="Habari! Karibu kwenye duka letu la mabando ya Halotel ya bei nafuu. Chagua bando lako hapa chini.",
-            payment_instructions="Lipa kwa:\n1. HaloPesa: Lipa Namba 123456\n2. M-Pesa: Lipa Namba 654321"
-        )
+    if not request.tenant:
+        # Main domain landing page
+        tenants = Tenant.objects.filter(is_active=True).order_by('subdomain')[:12]
+        return render(request, 'bundles/landing.html', {'tenants': tenants})
     
-    categories = BundleCategory.objects.all().order_by('display_order', 'name')
-    active_bundles = Bundle.objects.filter(is_active=True).select_related('category').order_by('price')
+    # Reseller shop domain
+    tenant = request.tenant
+    
+    # Only get categories that have active bundles for this tenant
+    categories = BundleCategory.objects.filter(
+        bundles__tenant=tenant, 
+        bundles__is_active=True
+    ).distinct().order_by('display_order', 'name')
+    
+    active_bundles = Bundle.objects.filter(
+        tenant=tenant, 
+        is_active=True
+    ).select_related('category').order_by('price')
 
     context = {
-        'config': config,
+        'config': tenant, # Passed as config so the old templates work out-of-the-box
         'categories': categories,
         'bundles': active_bundles,
     }
@@ -31,17 +38,27 @@ def index(request):
 
 
 def dashboard_login(request):
-    if request.user.is_authenticated:
-        return redirect('bundles:dashboard')
+    if not request.tenant:
+        return redirect('bundles:index')
         
+    if request.user.is_authenticated:
+        # Check permissions
+        if request.user == request.tenant.owner or request.user.is_superuser:
+            return redirect('bundles:dashboard')
+        else:
+            logout(request)
+            
     error_message = None
     if request.method == 'POST':
         u = request.POST.get('username')
         p = request.POST.get('password')
         user = authenticate(request, username=u, password=p)
         if user is not None:
-            login(request, user)
-            return redirect('bundles:dashboard')
+            if user == request.tenant.owner or user.is_superuser:
+                login(request, user)
+                return redirect('bundles:dashboard')
+            else:
+                error_message = "Akaunti hii haina ruhusa ya kusimamia duka hili!"
         else:
             error_message = "Jina la siri au neno la siri sio sahihi!"
 
@@ -55,24 +72,24 @@ def dashboard_logout(request):
 
 @login_required(login_url='bundles:login')
 def dashboard_home(request):
-    # Fetch configurations
-    config = ResellerConfig.objects.filter(is_active_config=True).first()
-    if not config:
-        config = ResellerConfig.objects.create(
-            business_name="Halotel Bundle Reseller",
-            whatsapp_number="255621234567",
-            is_active_config=True
-        )
+    if not request.tenant:
+        return redirect('bundles:index')
         
-    bundles = Bundle.objects.all().select_related('category').order_by('category__display_order', 'price')
+    # Security: Ensure current logged-in user owns the tenant or is superuser
+    if not (request.user == request.tenant.owner or request.user.is_superuser):
+        logout(request)
+        return redirect('bundles:login')
+        
+    tenant = request.tenant
+    bundles = Bundle.objects.filter(tenant=tenant).select_related('category').order_by('category__display_order', 'price')
     categories = BundleCategory.objects.all()
     
     # Initialize forms
     bundle_form = BundleForm()
-    config_form = ResellerConfigForm(instance=config)
+    config_form = ResellerConfigForm(instance=tenant)
     
     context = {
-        'config': config,
+        'config': tenant,
         'bundles': bundles,
         'categories': categories,
         'bundle_form': bundle_form,
@@ -84,20 +101,25 @@ def dashboard_home(request):
 @login_required(login_url='bundles:login')
 @require_POST
 def add_bundle(request):
+    if not request.tenant or not (request.user == request.tenant.owner or request.user.is_superuser):
+        return redirect('bundles:index')
+        
     form = BundleForm(request.POST)
     if form.is_valid():
-        form.save()
+        bundle = form.save(commit=False)
+        bundle.tenant = request.tenant
+        bundle.save()
         return redirect('bundles:dashboard')
-    # If invalid, render dashboard with errors
-    config = ResellerConfig.objects.filter(is_active_config=True).first()
-    bundles = Bundle.objects.all().select_related('category').order_by('category__display_order', 'price')
+        
+    tenant = request.tenant
+    bundles = Bundle.objects.filter(tenant=tenant).select_related('category').order_by('category__display_order', 'price')
     categories = BundleCategory.objects.all()
     context = {
-        'config': config,
+        'config': tenant,
         'bundles': bundles,
         'categories': categories,
         'bundle_form': form,
-        'config_form': ResellerConfigForm(instance=config),
+        'config_form': ResellerConfigForm(instance=tenant),
     }
     return render(request, 'bundles/dashboard.html', context)
 
@@ -105,7 +127,10 @@ def add_bundle(request):
 @login_required(login_url='bundles:login')
 @require_POST
 def delete_bundle(request, pk):
-    bundle = get_object_or_404(Bundle, pk=pk)
+    if not request.tenant or not (request.user == request.tenant.owner or request.user.is_superuser):
+        return redirect('bundles:index')
+        
+    bundle = get_object_or_404(Bundle, pk=pk, tenant=request.tenant)
     bundle.delete()
     return redirect('bundles:dashboard')
 
@@ -113,17 +138,19 @@ def delete_bundle(request, pk):
 @login_required(login_url='bundles:login')
 @require_POST
 def update_settings(request):
-    config = ResellerConfig.objects.filter(is_active_config=True).first()
-    form = ResellerConfigForm(request.POST, instance=config)
+    if not request.tenant or not (request.user == request.tenant.owner or request.user.is_superuser):
+        return redirect('bundles:index')
+        
+    tenant = request.tenant
+    form = ResellerConfigForm(request.POST, instance=tenant)
     if form.is_valid():
         form.save()
         return redirect('bundles:dashboard')
         
-    # If invalid, render dashboard with errors
-    bundles = Bundle.objects.all().select_related('category').order_by('category__display_order', 'price')
+    bundles = Bundle.objects.filter(tenant=tenant).select_related('category').order_by('category__display_order', 'price')
     categories = BundleCategory.objects.all()
     context = {
-        'config': config,
+        'config': tenant,
         'bundles': bundles,
         'categories': categories,
         'bundle_form': BundleForm(),
@@ -136,6 +163,9 @@ def update_settings(request):
 @require_POST
 @ensure_csrf_cookie
 def toggle_bundle_status(request, pk):
+    if not request.tenant or not (request.user == request.tenant.owner or request.user.is_superuser):
+        return JsonResponse({'success': False, 'error': 'Ruhusa imekataliwa'}, status=403)
+        
     try:
         data = json.loads(request.body)
         field = data.get('field')
@@ -144,7 +174,7 @@ def toggle_bundle_status(request, pk):
         if field not in ['is_active', 'is_hot']:
             return JsonResponse({'success': False, 'error': 'Uwanja usioruhusiwa'}, status=400)
             
-        bundle = Bundle.objects.get(pk=pk)
+        bundle = Bundle.objects.get(pk=pk, tenant=request.tenant)
         setattr(bundle, field, bool(value))
         bundle.save()
         
@@ -159,13 +189,16 @@ def toggle_bundle_status(request, pk):
 @require_POST
 @ensure_csrf_cookie
 def update_bundle_price(request, pk):
+    if not request.tenant or not (request.user == request.tenant.owner or request.user.is_superuser):
+        return JsonResponse({'success': False, 'error': 'Ruhusa imekataliwa'}, status=403)
+        
     try:
         data = json.loads(request.body)
         price = int(data.get('price', 0))
         if price <= 0:
             return JsonResponse({'success': False, 'error': 'Bei lazima izidi 0'}, status=400)
             
-        bundle = Bundle.objects.get(pk=pk)
+        bundle = Bundle.objects.get(pk=pk, tenant=request.tenant)
         bundle.price = price
         bundle.save()
         
@@ -176,3 +209,4 @@ def update_bundle_price(request, pk):
         return JsonResponse({'success': False, 'error': 'Bei isiyo halali'}, status=400)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+

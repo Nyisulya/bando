@@ -1,5 +1,5 @@
 from django import forms
-from .models import Bundle, ResellerConfig
+from .models import Bundle, Tenant
 
 class BundleForm(forms.ModelForm):
     class Meta:
@@ -19,7 +19,7 @@ class BundleForm(forms.ModelForm):
 
 class ResellerConfigForm(forms.ModelForm):
     class Meta:
-        model = ResellerConfig
+        model = Tenant
         fields = ['business_name', 'whatsapp_number', 'welcome_message', 'payment_instructions']
         widgets = {
             'business_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Jina la Duka'}),

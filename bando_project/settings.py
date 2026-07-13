@@ -46,9 +46,15 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'bundles.middleware.TenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Multi-tenant settings
+MAIN_DOMAIN = 'localhost'
+MAIN_DOMAINS = ['localhost', '127.0.0.1', 'www.localhost']
+
 
 ROOT_URLCONF = 'bando_project.urls'
 
