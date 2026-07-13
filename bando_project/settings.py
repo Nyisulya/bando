@@ -52,8 +52,14 @@ MIDDLEWARE = [
 ]
 
 # Multi-tenant settings
-MAIN_DOMAIN = 'localhost'
-MAIN_DOMAINS = ['localhost', '127.0.0.1', 'www.localhost']
+MAIN_DOMAIN = 'phinabundles.nyisu.com'
+MAIN_DOMAINS = [
+    'phinabundles.nyisu.com',
+    'www.phinabundles.nyisu.com',
+    'localhost',
+    '127.0.0.1',
+    'www.localhost'
+]
 
 
 ROOT_URLCONF = 'bando_project.urls'
