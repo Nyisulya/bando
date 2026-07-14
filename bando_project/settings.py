@@ -52,10 +52,10 @@ MIDDLEWARE = [
 ]
 
 # Multi-tenant settings
-MAIN_DOMAIN = 'phinabundles.nyisu.com'
+MAIN_DOMAIN = 'bando.nyisu.com'
 MAIN_DOMAINS = [
-    'phinabundles.nyisu.com',
-    'www.phinabundles.nyisu.com',
+    'bando.nyisu.com',
+    'www.bando.nyisu.com',
     'localhost',
     '127.0.0.1',
     'www.localhost'
