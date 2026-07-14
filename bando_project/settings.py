@@ -61,6 +61,15 @@ MAIN_DOMAINS = [
     'www.localhost'
 ]
 
+# Allow CSRF for HTTPS subdomains
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.bando.nyisu.com',
+    'https://bando.nyisu.com',
+    'https://*.nyisu.com',
+    'https://nyisu.com',
+]
+
+
 
 ROOT_URLCONF = 'bando_project.urls'
 
