@@ -7,7 +7,7 @@
     <title>{{ config.business_name }} - Mabando ya Internet ya Halotel</title>
     
     <!-- Meta tags for SEO -->
-    <meta name="description" content="Nunua mabando ya Halotel ya bei nafuu kabisa. Huduma ya haraka na ya kuaminika kwa sekunde 30 tu.">
+    <meta name="description" content="{% if config.welcome_message %}{{ config.welcome_message|truncatechars:150 }}{% else %}Nunua mabando ya Halotel ya bei nafuu kabisa. Huduma ya haraka na ya kuaminika kwa sekunde 30 tu.{% endif %}">
     <meta name="keywords" content="Halotel, mabando, bando la bei nafuu, internet, tanzania, HaloPesa">
     
     <!-- Google Fonts & FontAwesome Icons -->

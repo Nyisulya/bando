@@ -6,6 +6,7 @@ app_name = 'bundles'
 urlpatterns = [
     # Customer-facing website
     path('', views.index, name='index'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
     
     # Custom dashboard authentication
     path('dashboard/login/', views.dashboard_login, name='login'),
