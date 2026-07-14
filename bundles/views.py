@@ -212,12 +212,30 @@ def update_bundle_price(request, pk):
 
 
 def robots_txt(request):
+    host = request.get_host()
+    protocol = 'https' if request.is_secure() else 'http'
     lines = [
         "User-agent: *",
         "Allow: /",
         "Disallow: /admin/",
         "Disallow: /dashboard/",
+        f"Sitemap: {protocol}://{host}/sitemap.xml"
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+    host = request.get_host()
+    protocol = 'https' if request.is_secure() else 'http'
+    sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{protocol}://{host}/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>"""
+    return HttpResponse(sitemap_content, content_type="application/xml")
+
 
 
