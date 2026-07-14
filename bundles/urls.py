@@ -8,6 +8,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+    path('sitemap-main.xml', views.sitemap_main_xml, name='sitemap_main_xml'),
+
 
     
     # Custom dashboard authentication

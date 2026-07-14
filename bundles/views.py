@@ -227,6 +227,25 @@ def robots_txt(request):
 def sitemap_xml(request):
     host = request.get_host()
     protocol = 'https' if request.is_secure() else 'http'
+    
+    # Check if this request is on the main landing page/domain (no tenant)
+    if not request.tenant:
+        # Main domain: Return a Sitemap Index pointing to all sub-sitemaps
+        tenants = Tenant.objects.filter(is_active=True)
+        sitemap_index_content = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            f'  <sitemap>\n    <loc>{protocol}://{host}/sitemap-main.xml</loc>\n  </sitemap>'
+        ]
+        
+        for tenant in tenants:
+            tenant_host = f"{tenant.subdomain}.{host}"
+            sitemap_index_content.append(f"  <sitemap>\n    <loc>{protocol}://{tenant_host}/sitemap.xml</loc>\n  </sitemap>")
+            
+        sitemap_index_content.append('</sitemapindex>')
+        return HttpResponse("\n".join(sitemap_index_content), content_type="application/xml")
+    
+    # Otherwise, it's a tenant subdomain shop! Return the single URL for the shop
     sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
@@ -236,6 +255,24 @@ def sitemap_xml(request):
     </url>
 </urlset>"""
     return HttpResponse(sitemap_content, content_type="application/xml")
+
+
+def sitemap_main_xml(request):
+    if request.tenant:
+        return HttpResponse(status=404)
+        
+    host = request.get_host()
+    protocol = 'https' if request.is_secure() else 'http'
+    sitemap_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{protocol}://{host}/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+</urlset>"""
+    return HttpResponse(sitemap_content, content_type="application/xml")
+
 
 
 
