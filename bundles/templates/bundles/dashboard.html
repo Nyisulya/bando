@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
     
+    <!-- Dynamic Custom Colors for Tenant -->
+    <style>
+        :root {
+            --primary: {{ config.primary_color|default:"#ff6f00" }};
+            --primary-hover: {{ config.primary_color|default:"#ff6f00" }}ee;
+            --primary-glow: {{ config.primary_color|default:"#ff6f00" }}40;
+            --secondary: {{ config.secondary_color|default:"#ffb300" }};
+        }
+        [data-theme="light"] {
+            --border-hover: {{ config.primary_color|default:"#ff6f00" }}80;
+        }
+    </style>
+    
     <style>
         /* Extra styles specific to the dashboard layout */
         .dashboard-container {
@@ -398,6 +411,17 @@
                     <div class="form-group">
                         <label class="form-label">Maelekezo ya Malipo (Lipa Namba n.k.)</label>
                         {{ config_form.payment_instructions }}
+                    </div>
+                    
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-palette" style="color: var(--primary);"></i> Rangi Kuu</label>
+                            {{ config_form.primary_color }}
+                        </div>
+                        <div>
+                            <label class="form-label" style="display: flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-palette" style="color: var(--secondary);"></i> Rangi ya Pili</label>
+                            {{ config_form.secondary_color }}
+                        </div>
                     </div>
                     
                     <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, var(--accent), #059669); box-shadow: 0 4px 15px var(--accent-glow);">

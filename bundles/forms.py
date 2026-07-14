@@ -20,10 +20,13 @@ class BundleForm(forms.ModelForm):
 class ResellerConfigForm(forms.ModelForm):
     class Meta:
         model = Tenant
-        fields = ['business_name', 'whatsapp_number', 'welcome_message', 'payment_instructions']
+        fields = ['business_name', 'whatsapp_number', 'welcome_message', 'payment_instructions', 'primary_color', 'secondary_color']
         widgets = {
             'business_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Jina la Duka'}),
             'whatsapp_number': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Mfano: 255620123456'}),
             'welcome_message': forms.Textarea(attrs={'class': 'form-input', 'rows': 2}),
             'payment_instructions': forms.Textarea(attrs={'class': 'form-input', 'rows': 4}),
+            'primary_color': forms.TextInput(attrs={'type': 'color', 'class': 'form-color-picker', 'style': 'width: 100%; height: 42px; padding: 0; border: none; border-radius: var(--radius-md); cursor: pointer; background: none;'}),
+            'secondary_color': forms.TextInput(attrs={'type': 'color', 'class': 'form-color-picker', 'style': 'width: 100%; height: 42px; padding: 0; border: none; border-radius: var(--radius-md); cursor: pointer; background: none;'}),
         }
+

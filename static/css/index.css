@@ -55,6 +55,13 @@
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
 }
 
+[data-theme="light"] .hero h1 {
+    background: linear-gradient(to right, #111827, #374151, var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
 /* Base Styles */
 * {
     margin: 0;

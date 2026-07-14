@@ -41,6 +41,16 @@ class Tenant(models.Model):
         default="Lipa kwa:\n1. HaloPesa: Lipa Namba (Till) 123456\n2. M-Pesa: Lipa Namba (Till) 654321\n\nBaada ya kulipia, oda yako itashughulikiwa mara moja na utapokea bando.",
         verbose_name="Maelekezo ya Malipo"
     )
+    primary_color = models.CharField(
+        max_length=7, 
+        default="#ff6f00", 
+        verbose_name="Rangi Kuu (Hex)"
+    )
+    secondary_color = models.CharField(
+        max_length=7, 
+        default="#ffb300", 
+        verbose_name="Rangi ya Pili (Hex)"
+    )
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Tarehe ya Kuundwa")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Tarehe ya Kurekebishwa")

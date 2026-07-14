@@ -15,6 +15,19 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    
+    <!-- Dynamic Custom Colors for Tenant -->
+    <style>
+        :root {
+            --primary: {{ config.primary_color|default:"#ff6f00" }};
+            --primary-hover: {{ config.primary_color|default:"#ff6f00" }}ee;
+            --primary-glow: {{ config.primary_color|default:"#ff6f00" }}40;
+            --secondary: {{ config.secondary_color|default:"#ffb300" }};
+        }
+        [data-theme="light"] {
+            --border-hover: {{ config.primary_color|default:"#ff6f00" }}80;
+        }
+    </style>
 </head>
 <body>
 
